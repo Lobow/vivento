@@ -1,0 +1,26 @@
+# Backend (Python)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+event-management-back/data/
+event-management-back/*.db
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Frontend (Node)
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Ambiente
+.env
+.env.local
+
+# Editores / SO
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
