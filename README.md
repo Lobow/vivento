@@ -230,7 +230,7 @@ Principais endpoints:
 | GET    | `/events/{id}`                           | não   | Detalhe do evento                            |
 | PUT    | `/events/{id}`                           | sim*  | Atualiza evento (apenas o organizador)       |
 | DELETE | `/events/{id}`                           | sim*  | Remove evento (apenas o organizador)         |
-| GET    | `/events/{id}/participants`              | não   | Lista participantes do evento                |
+| GET    | `/events/{id}/participants`              | sim*  | Lista participantes do evento                |
 | POST   | `/events/{id}/participants`              | não   | Inscreve um participante (respeita vagas)    |
 | DELETE | `/events/{id}/participants/{pid}`        | sim*  | Remove participante (apenas o organizador)   |
 | GET    | `/health`, `/healthz`                    | não   | Health check                                 |
