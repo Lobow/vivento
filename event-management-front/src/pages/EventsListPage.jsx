@@ -64,7 +64,7 @@ export default function EventsListPage() {
           </div>
           <div className="field filters__date">
             <label htmlFor="date-filter">Data específica</label>
-            <input id="date-filter" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+            <input id="date-filter" min={new Date().toISOString().split('T')[0]} type="date" value={date} onChange={(e) => setDate(e.target.value)} />
           </div>
         </div>
 

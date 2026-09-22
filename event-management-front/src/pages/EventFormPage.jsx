@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { createEvent, getEvent, updateEvent } from "../api/events";
+import { createEvent, getEvent, updateEvent, getEventImage } from "../api/events";
 import { extractErrorMessage } from "../api/client";
 import { Loader } from "../components/StateBlocks";
+import "./EventFormPage.css";
 
 function toDatetimeLocal(isoString) {
   if (!isoString) return "";
@@ -12,17 +13,50 @@ function toDatetimeLocal(isoString) {
   return local.toISOString().slice(0, 16);
 }
 
-const emptyForm = { name: "", description: "", date_time: "", location: "", capacity: 50 };
+const emptyForm = { name: "", description: "", date_time: "", location: "", capacity: 50, file: null };
+
+const now = new Date();
+
+const minDateTime =
+  `${now.getFullYear()}-` +
+  `${String(now.getMonth() + 1).padStart(2, '0')}-` +
+  `${String(now.getDate()).padStart(2, '0')}T` +
+  `${String(now.getHours()).padStart(2, '0')}:` +
+  `${String(now.getMinutes()).padStart(2, '0')}`;
 
 export default function EventFormPage() {
   const { id } = useParams();
   const isEditing = Boolean(id);
   const navigate = useNavigate();
+  const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState(null);
 
   const [form, setForm] = useState(emptyForm);
   const [loading, setLoading] = useState(isEditing);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+
+    const handleImageChange = (e) => {
+    console.log(e.target.files)
+    const file = e.target.files?.[0];
+    
+    if (!file) return;
+
+    setImage(file);
+    setPreview(URL.createObjectURL(file));
+    handleChange("file", e.target.files?.[0])
+  };
+
+    async function loadImage(id){
+      const img = await getEventImage(id);
+      const urlData = URL.createObjectURL(img);
+      if(urlData){
+        setImage(img)
+        setPreview(urlData);
+      }
+    }
+  
 
   useEffect(() => {
     if (!isEditing) return;
@@ -35,14 +69,23 @@ export default function EventFormPage() {
           location: event.location,
           capacity: event.capacity,
         });
+
+
+
+        if (event.has_image) {
+          loadImage(event.id);
+        }
       })
       .catch((err) => setError(extractErrorMessage(err, "Não foi possível carregar o evento.")))
       .finally(() => setLoading(false));
-  }, [id, isEditing]);
+    
+  }, [id,isEditing]);
+
 
   function handleChange(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
+
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -56,6 +99,7 @@ export default function EventFormPage() {
     };
 
     try {
+      console.log(payload)
       const event = isEditing ? await updateEvent(id, payload) : await createEvent(payload);
       navigate(`/events/${event.id}`);
     } catch (err) {
@@ -104,6 +148,7 @@ export default function EventFormPage() {
               <input
                 id="date_time"
                 type="datetime-local"
+                min={minDateTime}
                 value={form.date_time}
                 onChange={(e) => handleChange("date_time", e.target.value)}
                 required
@@ -130,6 +175,38 @@ export default function EventFormPage() {
               onChange={(e) => handleChange("location", e.target.value)}
               required
             />
+          </div>
+
+          <div className="field">
+            <div className="image-upload">
+              <label htmlFor="banner-image" className="upload-button">
+                <span className="upload-title">Adicionar imagem</span>
+
+                <span className="upload-subtitle">
+                  { !image ?
+                  'PNG, JPG ou WebP'
+                      : image.name
+                }
+                </span>
+             
+              </label>
+
+              <input
+                id="banner-image"
+                type="file"
+                accept="image/*"
+                onChange={(e)=> {handleImageChange(e)}}
+              />
+            </div>
+            {preview && (
+                      <div>
+                          <img
+                            src={preview}
+                            alt="Preview"
+                            className="preview-image"
+                          />
+                      </div>    
+                        )}
           </div>
 
           <button className="btn btn-primary btn-block" type="submit" disabled={submitting}>

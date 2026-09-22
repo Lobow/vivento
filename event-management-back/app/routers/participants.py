@@ -20,8 +20,15 @@ def _get_event_or_404(db: Session, event_id: str) -> Event:
 
 
 @router.get("", response_model=list[ParticipantOut])
-def list_participants(event_id: str, db: Session = Depends(get_db)) -> list[Participant]:
-    _get_event_or_404(db, event_id)
+def list_participants(event_id: str, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)) -> list[Participant]:
+    event = _get_event_or_404(db, event_id)
+
+    if event.organizer_id != current_user.id:
+        raise [HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Você não tem permissão para gerenciar participantes deste evento",
+        )]
+
     return db.query(Participant).filter(Participant.event_id == event_id).all()
 
 
@@ -29,11 +36,7 @@ def list_participants(event_id: str, db: Session = Depends(get_db)) -> list[Part
 def register_participant(
     event_id: str, payload: ParticipantCreate, db: Session = Depends(get_db)
 ) -> Participant:
-    """Inscreve um participante no evento, respeitando o limite de vagas.
-
-    Endpoint público: qualquer pessoa pode se inscrever em um evento, sem
-    necessidade de login — o cadastro de conta é apenas para organizadores.
-    """
+ 
     event = _get_event_or_404(db, event_id)
 
     current_count = count_participants(db, event_id)
@@ -64,7 +67,6 @@ def remove_participant(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> None:
-    """Remove a inscrição de um participante. Requer autenticação (organizador do evento)."""
     event = _get_event_or_404(db, event_id)
     if event.organizer_id != current_user.id:
         raise HTTPException(

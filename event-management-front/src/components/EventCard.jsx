@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import StatusBadge from "./StatusBadge";
+import { getEventImage } from "../api/events";
 import "./EventCard.css";
+import { useEffect,useState } from "react";
 
 const MONTHS = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
 
@@ -10,12 +12,36 @@ function formatTime(dateStr) {
 }
 
 export default function EventCard({ event }) {
+  const [image, setImage] = useState(null);
   const date = new Date(event.date_time);
   const day = date.getDate().toString().padStart(2, "0");
   const month = MONTHS[date.getMonth()];
 
+  useEffect(()=>{
+        if (!event.has_image) {
+            return;
+        }
+
+        loadImage();
+  },[event.id, event.has_image])
+
+  async function loadImage(){
+    const img = await getEventImage(event.id);
+    const urlData = URL.createObjectURL(img)
+    if(urlData){
+      setImage(urlData)
+    }
+  }
+
   return (
     <Link to={`/events/${event.id}`} className="event-card">
+      {   image && (<div className="event-image">
+                  <img
+              src={image}
+              alt={event.name}
+          />
+            </div>)}
+    <div>     
       <div className="event-card__day">
         <span className="event-card__day-number">{day}</span>
         <span className="event-card__day-month">{month}</span>
@@ -36,6 +62,7 @@ export default function EventCard({ event }) {
             : `${event.spots_left} de ${event.capacity} vagas disponíveis`}
         </p>
       </div>
+    </div> 
     </Link>
   );
 }

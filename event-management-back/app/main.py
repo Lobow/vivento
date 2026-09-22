@@ -14,8 +14,6 @@ from app.routers import auth, events, participants
 
 settings = get_settings()
 
-# Logging estruturado simples (JSON-like), útil para agregadores de log em
-# ambientes cloud native (stdout é o padrão esperado por Kubernetes).
 logging.basicConfig(
     level=logging.INFO,
     format='{"timestamp":"%(asctime)s","level":"%(levelname)s","logger":"%(name)s","message":"%(message)s"}',
@@ -25,8 +23,6 @@ logger = logging.getLogger("event_management")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Em um projeto com Postgres/Alembic, migrações rodariam separadamente.
-    # Para o SQLite local deste desafio, criamos as tabelas no startup.
     Base.metadata.create_all(bind=engine)
     logger.info("Aplicação iniciada, tabelas garantidas no banco de dados")
     yield
@@ -66,7 +62,6 @@ async def log_requests(request: Request, call_next):
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    """Padroniza erros de validação (422) em um formato claro para o frontend."""
     errors = [
         {"field": ".".join(str(loc) for loc in err["loc"] if loc != "body"), "message": err["msg"]}
         for err in exc.errors()
@@ -77,7 +72,6 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     )
 
 
-# --- Health checks (essenciais para orquestração cloud native / K8s probes) ---
 @app.get("/health", tags=["health"])
 @app.get("/healthz", tags=["health"])
 def health_check() -> dict:
