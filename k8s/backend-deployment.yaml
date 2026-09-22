@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: event-management-backend
+  labels:
+    app: event-management-backend
+spec:
+  # 1 réplica porque a persistência aqui é SQLite (arquivo único, não
+  # seguro para múltiplos pods concorrentes). Para escalar horizontalmente,
+  # troque DATABASE_URL para Postgres e aumente replicas — veja o README.
+  replicas: 1
+  selector:
+    matchLabels:
+      app: event-management-backend
+  template:
+    metadata:
+      labels:
+        app: event-management-backend
+    spec:
+      containers:
+        - name: backend
+          image: event-management-backend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: event-management-backend-config
+            - secretRef:
+                name: event-management-backend-secret
+          # Probes usando o endpoint de health check exigido no desafio.
+          # Importante: com SQLite o Deployment não é totalmente stateless
+          # (veja observação no README sobre volumes/Postgres em produção).
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          volumeMounts:
+            - name: data
+              mountPath: /app/data
+      volumes:
+        - name: data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: event-management-backend
+  labels:
+    app: event-management-backend
+spec:
+  selector:
+    app: event-management-backend
+  ports:
+    - port: 80
+      targetPort: 8000
+  type: ClusterIP

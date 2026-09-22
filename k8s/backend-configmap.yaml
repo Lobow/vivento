@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: event-management-backend-config
+  labels:
+    app: event-management-backend
+data:
+  APP_NAME: "Event Management API"
+  ENVIRONMENT: "production"
+  DATABASE_URL: "sqlite:///./data/event_management.db"
+  ALGORITHM: "HS256"
+  ACCESS_TOKEN_EXPIRE_MINUTES: "60"
+  CORS_ORIGINS: "https://app.example.com"
+---
+# Em produção, o Secret normalmente é criado fora do Git (ex: via
+# `kubectl create secret` ou um gerenciador externo como Sealed Secrets /
+# Vault). Este manifest é apenas um EXEMPLO ilustrativo — não use este valor.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: event-management-backend-secret
+  labels:
+    app: event-management-backend
+type: Opaque
+stringData:
+  SECRET_KEY: "replace-with-a-strong-random-secret-in-production"

@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: event-management-frontend
+  labels:
+    app: event-management-frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: event-management-frontend
+  template:
+    metadata:
+      labels:
+        app: event-management-frontend
+    spec:
+      containers:
+        - name: frontend
+          # A URL da API já vem "baked" no bundle estático (build-time), por
+          # isso não há env vars de runtime aqui — veja o README para detalhes.
+          image: event-management-frontend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "250m"
+              memory: "128Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: event-management-frontend
+  labels:
+    app: event-management-frontend
+spec:
+  selector:
+    app: event-management-frontend
+  ports:
+    - port: 80
+      targetPort: 8080
+  type: ClusterIP
