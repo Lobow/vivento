@@ -2,7 +2,7 @@
 import uuid
 from datetime import UTC, datetime
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import DateTime, ForeignKey, Integer, LargeBinary, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -17,7 +17,6 @@ def _utcnow() -> datetime:
 
 
 class User(Base):
-    """Usuário organizador, autentica via OAuth2 password flow (JWT)."""
 
     __tablename__ = "users"
 
@@ -31,7 +30,6 @@ class User(Base):
 
 
 class Event(Base):
-    """Evento gerenciado na plataforma."""
 
     __tablename__ = "events"
 
@@ -53,10 +51,11 @@ class Event(Base):
     participants: Mapped[list["Participant"]] = relationship(
         back_populates="event", cascade="all, delete-orphan"
     )
-
+    
+    image_data: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True, default=None)
+    image_content_type: Mapped[str | None] = mapped_column(String(100), nullable=True, default=None)
 
 class Participant(Base):
-    """Inscrição de um participante em um evento."""
 
     __tablename__ = "participants"
     __table_args__ = (UniqueConstraint("event_id", "email", name="uq_participant_event_email"),)

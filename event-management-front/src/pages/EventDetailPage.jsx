@@ -34,10 +34,10 @@ export default function EventDetailPage() {
     try {
       const [eventData, participantsData] = await Promise.all([
         getEvent(id),
-        listParticipants(id),
+        isAuthenticated && listParticipants(id),
       ]);
       setEvent(eventData);
-      setParticipants(participantsData);
+      isAuthenticated && setParticipants(participantsData);
     } catch (err) {
       setError(extractErrorMessage(err, "Não foi possível carregar o evento."));
     } finally {
@@ -111,12 +111,12 @@ export default function EventDetailPage() {
         </div>
       </div>
 
-      <ParticipantsPanel
+      {isAuthenticated && <ParticipantsPanel
         event={event}
         participants={participants}
         onChanged={load}
         isOwner={isOwner}
-      />
+      />}
     </div>
   );
 }

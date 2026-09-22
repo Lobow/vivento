@@ -1,0 +1,57 @@
+#banner-image{
+      display: none;
+}
+.preview-image{
+  width: 100%;
+  border-radius: 10px;
+}
+.upload-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 140px;
+
+  border: 2px dashed #d1d5db;
+  border-radius: 12px;
+
+  background: #fff;
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.upload-button:hover {
+  border-color: #2563eb;
+  background: #f8faff;
+}
+
+.upload-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 36px;
+  height: 36px;
+  margin-bottom: 8px;
+
+  border-radius: 50%;
+  background: #2563eb;
+  color: white;
+
+  font-size: 24px;
+}
+
+.upload-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.upload-subtitle {
+  margin-top: 4px;
+
+  font-size: 12px;
+  color: #6b7280;
+}

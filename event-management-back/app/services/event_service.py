@@ -41,6 +41,7 @@ def serialize_event(db: Session, event: Event) -> dict:
         "participants_count": count,
         "spots_left": max(event.capacity - count, 0),
         "status": event_status(event, count),
+        "has_image": event.image_data is not None,
     }
 
 

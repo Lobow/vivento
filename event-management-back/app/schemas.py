@@ -4,6 +4,7 @@ from __future__ import annotations
 from datetime import datetime
 from enum import Enum
 
+from fastapi import Form
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 
@@ -52,7 +53,11 @@ class EventBase(BaseModel):
 
 
 class EventCreate(EventBase):
-    pass
+    name: str = Field(min_length=2, max_length=180)
+    description: str = Field(max_length=4000)
+    date_time: datetime
+    location: str = Field(min_length=2, max_length=255)
+    capacity: int = Field(gt=0, le=1_000_000)
 
 
 class EventUpdate(BaseModel):
@@ -80,8 +85,9 @@ class EventOut(EventBase):
     participants_count: int = 0
     spots_left: int = 0
     status: EventStatus
-
-
+    image_url: str | None = None
+    has_image: bool = False
+    
 class EventListOut(BaseModel):
     total: int
     items: list[EventOut]
