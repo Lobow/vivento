@@ -3,19 +3,22 @@ from datetime import UTC, datetime, timedelta
 
 def _create_event(client, auth_headers, capacity=2):
     payload = {
+        "id": 1,
         "name": "Workshop de Python",
         "description": "Aprenda Python do zero",
         "date_time": (datetime.now(UTC) + timedelta(days=3)).isoformat(),
         "location": "Sala 1",
         "capacity": capacity,
     }
-    return client.post("/events", json=payload, headers=auth_headers).json()
+    return client.post("/events", data=payload, files={"file": ("cover.png", b"\x89PNG\r\n\x1a\n123", "image/png")}, headers=auth_headers).json()
 
 
 def test_register_participant_success(client, auth_headers):
+                
+    
     event = _create_event(client, auth_headers)
     response = client.post(
-        f"/events/{event['id']}/participants",
+        f"/events/{event["id"]}/participants",
         json={"name": "João", "email": "joao@teste.com"},
     )
     assert response.status_code == 201
@@ -49,8 +52,9 @@ def test_list_participants(client, auth_headers):
     client.post(
         f"/events/{event['id']}/participants",
         json={"name": "João", "email": "joao@teste.com"},
+        headers=auth_headers,
     )
-    response = client.get(f"/events/{event['id']}/participants")
+    response = client.get(f"/events/{event['id']}/participants", headers=auth_headers)
     assert response.status_code == 200
     assert len(response.json()) == 1
 
