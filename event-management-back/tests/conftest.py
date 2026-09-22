@@ -1,4 +1,5 @@
 """Fixtures compartilhadas de teste: banco SQLite isolado em memória por teste."""
+
 import os
 
 os.environ["DATABASE_URL"] = "sqlite:///./data/test_event_management.db"

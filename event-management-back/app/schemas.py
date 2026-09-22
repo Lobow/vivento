@@ -1,8 +1,10 @@
 """Schemas Pydantic usados para validação de entrada e serialização de saída."""
+
 from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
+
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 
@@ -85,7 +87,8 @@ class EventOut(EventBase):
     status: EventStatus
     image_url: str | None = None
     has_image: bool = False
-    
+
+
 class EventListOut(BaseModel):
     total: int
     items: list[EventOut]

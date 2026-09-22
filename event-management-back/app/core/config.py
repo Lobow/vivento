@@ -6,6 +6,7 @@ variáveis de ambiente (via pydantic-settings), nunca hardcoded no código.
 Em desenvolvimento, os valores podem vir de um arquivo `.env` na raiz do
 backend (veja `.env.example`).
 """
+
 from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict

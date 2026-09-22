@@ -1,4 +1,5 @@
 """Regras de negócio relacionadas a eventos (mantidas fora dos routers)."""
+
 from datetime import UTC, datetime
 
 from sqlalchemy.orm import Session
@@ -69,9 +70,7 @@ def filter_events(db: Session, status_filter: EventStatus | None, date_filter: s
 
     if status_filter:
         events = [
-            e
-            for e in events
-            if event_status(e, count_participants(db, e.id)) == status_filter
+            e for e in events if event_status(e, count_participants(db, e.id)) == status_filter
         ]
 
     return events

@@ -10,15 +10,19 @@ def _create_event(client, auth_headers, capacity=2):
         "location": "Sala 1",
         "capacity": capacity,
     }
-    return client.post("/events", data=payload, files={"file": ("cover.png", b"\x89PNG\r\n\x1a\n123", "image/png")}, headers=auth_headers).json()
+    return client.post(
+        "/events",
+        data=payload,
+        files={"file": ("cover.png", b"\x89PNG\r\n\x1a\n123", "image/png")},
+        headers=auth_headers,
+    ).json()
 
 
 def test_register_participant_success(client, auth_headers):
-                
-    
+
     event = _create_event(client, auth_headers)
     response = client.post(
-        f"/events/{event["id"]}/participants",
+        f"/events/{event['id']}/participants",
         json={"name": "João", "email": "joao@teste.com"},
     )
     assert response.status_code == 201

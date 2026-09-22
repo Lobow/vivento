@@ -35,9 +35,7 @@ def test_login_wrong_password_fails(client):
         "/auth/register",
         json={"name": "Ana Silva", "email": "ana@teste.com", "password": "senha123"},
     )
-    response = client.post(
-        "/auth/token", data={"username": "ana@teste.com", "password": "errada"}
-    )
+    response = client.post("/auth/token", data={"username": "ana@teste.com", "password": "errada"})
     assert response.status_code == 401
 
 

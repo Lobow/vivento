@@ -5,6 +5,7 @@ Implementa o fluxo OAuth2 "password" (Resource Owner Password Credentials)
 usando `OAuth2PasswordBearer` do FastAPI, tokens JWT assinados com a
 `SECRET_KEY` vinda de variável de ambiente, e hashing de senha com bcrypt.
 """
+
 from datetime import UTC, datetime, timedelta
 
 from fastapi import Depends, HTTPException, status
@@ -56,9 +57,7 @@ credentials_exception = HTTPException(
 )
 
 
-def get_current_user(
-    token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
-) -> User:
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
     """Decodifica o JWT do header `Authorization: Bearer <token>` e retorna o usuário."""
     try:
         payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])

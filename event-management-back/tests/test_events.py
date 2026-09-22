@@ -27,21 +27,33 @@ def test_create_event_requires_authentication(client):
 
 
 def test_create_event_success(client, auth_headers):
-    response = client.post("/events", data=_event_payload(), files={"file": ("cover.png", b"\x89PNG\r\n\x1a\n123", "image/png")}, headers=auth_headers)
+    response = client.post(
+        "/events",
+        data=_event_payload(),
+        files={"file": ("cover.png", b"\x89PNG\r\n\x1a\n123", "image/png")},
+        headers=auth_headers,
+    )
     assert response.status_code == 201
-    
 
 
 def test_create_event_invalid_capacity_fails(client, auth_headers):
-    response = client.post(
-        "/events", json=_event_payload(capacity=0), headers=auth_headers
-    )
+    response = client.post("/events", json=_event_payload(capacity=0), headers=auth_headers)
     assert response.status_code == 422
 
 
 def test_list_events(client, auth_headers):
-    client.post("/events", data=_event_payload(name="Evento A"), files={"file": ("cover.png", b"\x89PNG\r\n\x1a\n123", "image/png")}, headers=auth_headers)
-    client.post("/events", data=_event_payload(name="Evento B"), files={"file": ("cover.png", b"\x89PNG\r\n\x1a\n123", "image/png")}, headers=auth_headers)
+    client.post(
+        "/events",
+        data=_event_payload(name="Evento A"),
+        files={"file": ("cover.png", b"\x89PNG\r\n\x1a\n123", "image/png")},
+        headers=auth_headers,
+    )
+    client.post(
+        "/events",
+        data=_event_payload(name="Evento B"),
+        files={"file": ("cover.png", b"\x89PNG\r\n\x1a\n123", "image/png")},
+        headers=auth_headers,
+    )
     response = client.get("/events")
     assert response.status_code == 200
 
@@ -52,21 +64,39 @@ def test_get_event_not_found(client):
 
 
 def test_update_event_by_owner(client, auth_headers):
-    created = client.post("/events", data=_event_payload(), files={"file": ("cover.png", b"\x89PNG\r\n\x1a\n123", "image/png")}, headers=auth_headers).json()
+    created = client.post(
+        "/events",
+        data=_event_payload(),
+        files={"file": ("cover.png", b"\x89PNG\r\n\x1a\n123", "image/png")},
+        headers=auth_headers,
+    ).json()
     response = client.put(
-        f"/events/{created['id']}", data=_event_payload(), files={"file": ("cover.png", b"\x89PNG\r\n\x1a\n123", "image/png")}, headers=auth_headers
+        f"/events/{created['id']}",
+        data=_event_payload(),
+        files={"file": ("cover.png", b"\x89PNG\r\n\x1a\n123", "image/png")},
+        headers=auth_headers,
     )
     assert response.status_code == 200
 
 
 def test_update_event_requires_authentication(client, auth_headers):
-    created = client.post("/events", data=_event_payload(), files={"file": ("cover.png", b"\x89PNG\r\n\x1a\n123", "image/png")}, headers=auth_headers).json()
+    created = client.post(
+        "/events",
+        data=_event_payload(),
+        files={"file": ("cover.png", b"\x89PNG\r\n\x1a\n123", "image/png")},
+        headers=auth_headers,
+    ).json()
     response = client.put(f"/events/{created['id']}", data={"name": "Novo Nome"})
     assert response.status_code == 401
 
 
 def test_delete_event_by_owner(client, auth_headers):
-    created = client.post("/events", data=_event_payload(), files={"file": ("cover.png", b"\x89PNG\r\n\x1a\n123", "image/png")}, headers=auth_headers).json()
+    created = client.post(
+        "/events",
+        data=_event_payload(),
+        files={"file": ("cover.png", b"\x89PNG\r\n\x1a\n123", "image/png")},
+        headers=auth_headers,
+    ).json()
     response = client.delete(f"/events/{created['id']}", headers=auth_headers)
     assert response.status_code == 204
     assert client.get(f"/events/{created['id']}").status_code == 404

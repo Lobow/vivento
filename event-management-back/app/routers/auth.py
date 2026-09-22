@@ -1,4 +1,5 @@
 """Endpoints de autenticação: cadastro e login (fluxo OAuth2 password / JWT)."""
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -32,9 +33,7 @@ def register(payload: UserCreate, db: Session = Depends(get_db)) -> User:
 
 
 @router.post("/token", response_model=Token)
-def login(
-    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
-) -> Token:
+def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)) -> Token:
     """Login compatível com OAuth2PasswordRequestForm (username=email, password).
 
     Usado tanto pelo Swagger UI (Authorize) quanto pelo frontend, que envia

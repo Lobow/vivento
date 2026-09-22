@@ -1,12 +1,23 @@
 """Endpoints de eventos: CRUD + listagem com filtros de status/data."""
+
 from datetime import datetime
-from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Response, UploadFile, status
-from sqlalchemy import null
+
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    Form,
+    HTTPException,
+    Query,
+    Response,
+    UploadFile,
+    status,
+)
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import Event, User
-from app.schemas import EventCreate, EventListOut, EventOut, EventStatus, EventUpdate
+from app.schemas import EventCreate, EventListOut, EventOut, EventStatus
 from app.security import get_current_user
 from app.services.event_service import filter_events, serialize_event
 
@@ -20,7 +31,8 @@ def _get_event_or_404(db: Session, event_id: str) -> Event:
     if not event:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Evento não encontrado")
     return event
- 
+
+
 @router.get("", response_model=EventListOut)
 def list_events(
     status_filter: EventStatus | None = Query(default=None, alias="status"),
@@ -50,7 +62,6 @@ async def create_event(
     current_user: User = Depends(get_current_user),
 ) -> dict:
 
-    
     payload = EventCreate(
         name=name,
         description=description,
@@ -62,7 +73,7 @@ async def create_event(
     event = Event(**payload.model_dump(), organizer_id=current_user.id)
 
     if file is not None:
-     contents = await file.read()
+        contents = await file.read()
 
     if len(contents) > MAX_IMAGE_SIZE_BYTES:
         raise HTTPException(
@@ -73,7 +84,7 @@ async def create_event(
     if contents:
         event.image_data = contents
         event.image_content_type = file.content_type
-        
+
     db.add(event)
     db.commit()
     db.refresh(event)
@@ -92,15 +103,6 @@ async def update_event(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> dict:
-    """Atualiza um evento existente. Requer autenticação e ser o organizador."""
-
-    payload = EventCreate(
-        name=name,
-        description=description,
-        date_time=date_time,
-        location=location,
-        capacity=capacity,
-    )
 
     event = _get_event_or_404(db, event_id)
 
@@ -110,13 +112,12 @@ async def update_event(
             detail="Você não tem permissão para editar este evento",
         )
 
-
     event.name = name
     event.description = description
     event.date_time = date_time
     event.location = location
     event.capacity = capacity
-    
+
     if file is not None:
         contents = await file.read()
 
@@ -135,10 +136,10 @@ async def update_event(
         event.image_data = contents
         event.image_content_type = file.content_type
 
-
     db.commit()
     db.refresh(event)
     return serialize_event(db, event)
+
 
 @router.get("/{event_id}/image")
 def get_event_image(

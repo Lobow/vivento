@@ -1,4 +1,5 @@
 """Models (tabelas) do SQLAlchemy."""
+
 import uuid
 from datetime import UTC, datetime
 
@@ -17,7 +18,6 @@ def _utcnow() -> datetime:
 
 
 class User(Base):
-
     __tablename__ = "users"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
@@ -30,7 +30,6 @@ class User(Base):
 
 
 class Event(Base):
-
     __tablename__ = "events"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
@@ -54,8 +53,8 @@ class Event(Base):
     image_data: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True, default=None)
     image_content_type: Mapped[str | None] = mapped_column(String(100), nullable=True, default=None)
 
-class Participant(Base):
 
+class Participant(Base):
     __tablename__ = "participants"
     __table_args__ = (UniqueConstraint("event_id", "email", name="uq_participant_event_email"),)
 
