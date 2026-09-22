@@ -69,6 +69,7 @@ Pré-requisitos: Docker e Docker Compose.
 
 ```bash
 # Na raiz do projeto
+# Lembre-se de utilizar o sudo ou usuário com maior autenticação caso esteja utilizando linux
 cp .env.example .env   # opcional — os valores padrão já funcionam localmente
 docker compose up --build
 ```

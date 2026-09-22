@@ -51,7 +51,6 @@ class Event(Base):
     participants: Mapped[list["Participant"]] = relationship(
         back_populates="event", cascade="all, delete-orphan"
     )
-    
     image_data: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True, default=None)
     image_content_type: Mapped[str | None] = mapped_column(String(100), nullable=True, default=None)
 

@@ -44,7 +44,7 @@ export default function ParticipantsPanel({ event, participants, onChanged, isOw
 
   return (
     <div className="participants-panel">
-      <div className="participants-panel__list-card">
+       {isOwner && ( <div className="participants-panel__list-card">
         <h3>Participantes inscritos ({participants.length})</h3>
         {participants.length === 0 ? (
           <p className="participants-panel__empty">Ainda não há inscrições para este evento.</p>
@@ -56,17 +56,17 @@ export default function ParticipantsPanel({ event, participants, onChanged, isOw
                   <strong>{p.name}</strong>
                   <span>{p.email}</span>
                 </div>
-                {isOwner && (
+              
                   <button className="btn btn-danger" onClick={() => handleRemove(p.id)}>
                     Remover
                   </button>
-                )}
+               
               </li>
             ))}
           </ul>
         )}
-      </div>
-
+      </div> 
+    )}
       <div className="participants-panel__form-card form-card">
         <h3>Inscreva-se</h3>
 

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { deleteEvent, getEvent } from "../api/events";
+import { deleteEvent, getEvent, getEventImage} from "../api/events";
 import { listParticipants } from "../api/participants";
 import { extractErrorMessage } from "../api/client";
 import { useAuth } from "../context/AuthContext";
@@ -29,6 +29,7 @@ export default function EventDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [deleting, setDeleting] = useState(false);
+  const [image, setImage] = useState(null);
 
   const load = useCallback(async () => {
     try {
@@ -45,8 +46,17 @@ export default function EventDetailPage() {
     }
   }, [id]);
 
+   async function loadImage(){
+    const img = await getEventImage(id);
+    const urlData = URL.createObjectURL(img)
+    if(urlData){
+      setImage(urlData)
+    }
+  }
+
   useEffect(() => {
     load();
+    loadImage();
   }, [load]);
 
   async function handleDelete() {
@@ -80,7 +90,16 @@ export default function EventDetailPage() {
           <p className="event-detail__meta">
             {formatDateTime(event.date_time)} · {event.location}
           </p>
+
         </div>
+          {
+            image && (<div className="detail-image">
+                  <img
+              src={image}
+              alt={event.name}
+          />
+            </div>)
+          }
 
         {isOwner && (
           <div className="event-detail__owner-actions">
@@ -111,12 +130,12 @@ export default function EventDetailPage() {
         </div>
       </div>
 
-      {isAuthenticated && <ParticipantsPanel
+       <ParticipantsPanel
         event={event}
         participants={participants}
         onChanged={load}
         isOwner={isOwner}
-      />}
+      />
     </div>
   );
 }

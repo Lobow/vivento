@@ -3,8 +3,6 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-
-from fastapi import Form
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 
